@@ -10,7 +10,7 @@ const PROFILE = {
   goalKg: 71,
   // 6-week plan starting "today" by default; user can re-weigh anytime.
   weeks: 6,
-  ageDefault: 35, // used for BMR estimate; adjust in code if known
+  ageDefault: 40, // used for BMR estimate; adjust in code if known
 };
 
 const STORE_KEY = 'peak.v1';

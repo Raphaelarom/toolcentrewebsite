@@ -38,7 +38,7 @@ python3 -m http.server 8000
 ## Notes & tuning
 
 - Calorie math uses Mifflin–St Jeor with a 1.55 activity multiplier and a ~22%
-  deficit. Age defaults to 35 in `app.js` (`PROFILE.ageDefault`) — change it for
+  deficit. Age is set to 40 in `app.js` (`PROFILE.ageDefault`) — change it for
   a more accurate maintenance estimate.
 - Start/goal weight and plan length live in the `PROFILE` object at the top of
   `app.js`.

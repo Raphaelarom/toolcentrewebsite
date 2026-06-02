@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Peak — 6-Week Transformation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <style>
+:root {
+  --bg: #0b1020;
+  --bg-2: #0f172a;
+  --panel: #141d33;
+  --panel-2: #1b2643;
+  --line: #243150;
+  --text: #e8edf7;
+  --muted: #8a96b2;
+  --accent: #38e0a6;
+  --accent-2: #5b8cff;
+  --warn: #ffb454;
+  --danger: #ff6b6b;
+  --ideal: #5b8cff;
+  --actual: #38e0a6;
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: radial-gradient(1200px 600px at 70% -10%, #16213f 0%, var(--bg) 55%);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Topbar */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(12px);
+  background: rgba(11,16,32,.82);
+  border-bottom: 1px solid var(--line);
+  padding: 14px clamp(16px, 4vw, 40px);
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.logo {
+  font-size: 22px; color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.brand h1 { margin: 0; font-size: 20px; letter-spacing: 3px; }
+.tagline { margin: 2px 0 0; font-size: 12px; color: var(--muted); letter-spacing: .5px; }
+
+.tabs { display: flex; gap: 6px; margin-top: 14px; overflow-x: auto; }
+.tab {
+  border: 1px solid transparent; background: transparent; color: var(--muted);
+  padding: 9px 16px; border-radius: 999px; font-size: 14px; font-weight: 600;
+  cursor: pointer; white-space: nowrap; transition: all .15s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--panel-2); color: var(--text); border-color: var(--line); }
+
+/* Layout */
+main { max-width: 880px; margin: 0 auto; padding: 22px clamp(16px, 4vw, 40px) 60px; }
+.view { display: none; animation: fade .25s ease; }
+.view.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.panel {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 20px; margin-bottom: 18px; box-shadow: var(--shadow);
+}
+.panel h2 { margin: 0 0 12px; font-size: 16px; letter-spacing: .3px; }
+.muted { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+.hint { color: var(--muted); font-size: 12.5px; margin: 12px 0 0; line-height: 1.5; }
+
+/* Hero */
+.hero {
+  display: flex; align-items: center; justify-content: center; gap: clamp(20px, 6vw, 60px);
+  background: linear-gradient(135deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 28px; margin-bottom: 18px; box-shadow: var(--shadow);
+}
+.hero-stat { display: flex; flex-direction: column; align-items: center; }
+.hero-stat .label { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+.big { font-size: clamp(40px, 11vw, 64px); font-weight: 800; line-height: 1; }
+.big small { font-size: 18px; color: var(--muted); margin-left: 4px; }
+.big.goal { color: var(--accent); }
+.hero-arrow { font-size: 28px; color: var(--muted); }
+
+/* Progress */
+.progress-wrap { margin-bottom: 18px; }
+.progress-head { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+.progress-bar { height: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.progress-bar.slim { height: 10px; }
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  border-radius: 999px; transition: width .5s ease;
+}
+
+/* Cards */
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; text-align: center; }
+.card-label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.card-value { display: block; font-size: 26px; font-weight: 700; margin-top: 6px; }
+.card-value small { font-size: 14px; color: var(--muted); }
+.card-value.status { font-size: 16px; color: var(--accent); }
+@media (max-width: 620px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+
+/* Today */
+.today-grid { display: flex; flex-direction: column; gap: 8px; }
+.today-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--panel-2); border-radius: 12px; }
+.today-item .pill { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+.coach p { line-height: 1.6; margin: 0; color: var(--text); }
+
+/* Pills by type */
+.pill.legs, .pill.strength { background: #3a2a6b; color: #cdb8ff; }
+.pill.hyrox { background: #6b2a3a; color: #ffb8c8; }
+.pill.run { background: #2a4a6b; color: #b8d8ff; }
+.pill.rest { background: #2a3a44; color: #9fd; }
+.pill.upper { background: #2a5b4a; color: #b8ffe0; }
+
+/* Forms */
+.inline-form { display: flex; gap: 10px; flex-wrap: wrap; }
+input[type=date], input[type=number] {
+  background: var(--bg-2); border: 1px solid var(--line); color: var(--text);
+  padding: 11px 14px; border-radius: 12px; font-size: 15px; font-family: inherit;
+}
+input:focus { outline: none; border-color: var(--accent-2); }
+.btn {
+  background: linear-gradient(135deg, var(--accent-2), var(--accent)); color: #04121e;
+  border: none; padding: 11px 20px; border-radius: 12px; font-weight: 700; font-size: 14px;
+  cursor: pointer; transition: transform .1s, filter .15s;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: scale(.97); }
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.btn.tiny { padding: 6px 12px; font-size: 12px; }
+
+/* Chart */
+.chart-legend { display: flex; gap: 18px; font-size: 12.5px; color: var(--muted); margin-bottom: 10px; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.dot.ideal { background: var(--ideal); }
+.dot.actual { background: var(--actual); }
+.chart-box { width: 100%; overflow: hidden; }
+#chart { width: 100%; height: auto; display: block; }
+
+/* Tables */
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.data-table th { text-align: left; color: var(--muted); font-weight: 600; font-size: 12px; padding: 8px; border-bottom: 1px solid var(--line); }
+.data-table td { padding: 10px 8px; border-bottom: 1px solid var(--line); }
+.data-table tr:last-child td { border-bottom: none; }
+.delta-down { color: var(--accent); }
+.delta-up { color: var(--warn); }
+.del-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 16px; }
+.del-btn:hover { color: var(--danger); }
+.empty { color: var(--muted); font-size: 13px; text-align: center; padding: 14px; }
+
+/* Plan */
+.week-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.week-title { text-align: center; }
+.week-title h2 { margin: 0; font-size: 22px; }
+.week-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.week-progress span { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+.plan-days { display: flex; flex-direction: column; gap: 12px; }
+.day-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.day-card.done { border-color: var(--accent); }
+.day-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.day-head .dow { font-weight: 700; font-size: 15px; }
+.day-head .check {
+  margin-left: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line);
+  background: transparent; cursor: pointer; color: transparent; font-size: 14px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.day-card.done .check { background: var(--accent); border-color: var(--accent); color: #04121e; }
+.day-title { font-size: 14px; color: var(--text); margin: 0 0 4px; }
+.day-detail { font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; }
+
+/* Nutrition */
+.macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 6px 0 4px; }
+.macro { border-radius: 14px; padding: 16px; text-align: center; border: 1px solid var(--line); }
+.macro-val { display: block; font-size: 26px; font-weight: 800; }
+.macro-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.macro.cal { background: linear-gradient(135deg, #1f2b4d, #141d33); }
+.macro.pro { background: linear-gradient(135deg, #2a5b4a, #141d33); }
+.macro.carb { background: linear-gradient(135deg, #2a4a6b, #141d33); }
+.macro.fat { background: linear-gradient(135deg, #5b4a2a, #141d33); }
+@media (max-width: 620px) { .macro-grid { grid-template-columns: repeat(2, 1fr); } }
+
+.checklist-static { margin: 0; padding-left: 18px; line-height: 1.7; font-size: 14px; }
+.checklist-static li { margin-bottom: 6px; }
+.checklist-static.warn li::marker { color: var(--warn); }
+
+#n-checklist .today-item { cursor: pointer; user-select: none; }
+#n-checklist .today-item.checked { opacity: .5; text-decoration: line-through; }
+.cbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); display: inline-flex; align-items: center; justify-content: center; font-size: 13px; color: transparent; }
+.today-item.checked .cbox { background: var(--accent); border-color: var(--accent); color: #04121e; }
+
+/* Footer */
+.footer { max-width: 880px; margin: 0 auto; padding: 0 clamp(16px,4vw,40px) 40px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12px; }
+
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">▲</span>
+      <div>
+        <h1>PEAK</h1>
+        <p class="tagline">6-week shred · 77 → 71 kg</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="weight">Weight</button>
+      <button class="tab" data-tab="plan">Training Plan</button>
+      <button class="tab" data-tab="nutrition">Nutrition</button>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="hero">
+        <div class="hero-stat">
+          <span class="label">Current</span>
+          <span class="big"><span id="d-current">—</span><small>kg</small></span>
+        </div>
+        <div class="hero-arrow">→</div>
+        <div class="hero-stat">
+          <span class="label">Goal</span>
+          <span class="big goal"><span id="d-goal">71</span><small>kg</small></span>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-head">
+          <span id="d-lost">0.0 kg lost</span>
+          <span id="d-remaining">6.0 kg to go</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="d-progress"></div></div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <span class="card-label">Days left</span>
+          <span class="card-value" id="d-days">42</span>
+        </div>
+        <div class="card">
+          <span class="card-label">On-track pace</span>
+          <span class="card-value" id="d-pace">—</span>
+        </div>
+        <div class="card">
+          <span class="card-label">This week's target</span>
+          <span class="card-value" id="d-weektarget">—<small>kg</small></span>
+        </div>
+        <div class="card">
+          <span class="card-label">Status</span>
+          <span class="card-value status" id="d-status">Let's go</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Today</h2>
+        <p class="muted" id="d-today-date"></p>
+        <div class="today-grid" id="d-today-workout"></div>
+      </div>
+
+      <div class="panel coach">
+        <h2>Coach's note</h2>
+        <p id="d-coach"></p>
+      </div>
+    </section>
+
+    <!-- WEIGHT -->
+    <section class="view" id="view-weight">
+      <div class="panel">
+        <h2>Log a weigh-in</h2>
+        <form id="weight-form" class="inline-form">
+          <input type="date" id="w-date" required />
+          <input type="number" id="w-kg" step="0.1" min="40" max="200" placeholder="kg" required />
+          <button type="submit" class="btn">Add</button>
+        </form>
+        <p class="hint">Weigh in first thing, after the bathroom, before eating — same conditions daily.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Trajectory</h2>
+        <div class="chart-legend">
+          <span><i class="dot ideal"></i> Ideal line</span>
+          <span><i class="dot actual"></i> Your weight</span>
+        </div>
+        <div class="chart-box"><canvas id="chart" width="900" height="380"></canvas></div>
+      </div>
+
+      <div class="panel">
+        <h2>History</h2>
+        <table class="data-table" id="weight-table">
+          <thead><tr><th>Date</th><th>Weight</th><th>Δ</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty" id="weight-empty">No weigh-ins yet — log your first one above.</p>
+      </div>
+    </section>
+
+    <!-- PLAN -->
+    <section class="view" id="view-plan">
+      <div class="week-switch">
+        <button class="btn ghost" id="week-prev">‹</button>
+        <div class="week-title">
+          <h2 id="plan-week-title">Week 1</h2>
+          <p class="muted" id="plan-week-focus"></p>
+        </div>
+        <button class="btn ghost" id="week-next">›</button>
+      </div>
+      <div class="week-progress">
+        <div class="progress-bar slim"><div class="progress-fill" id="plan-progress"></div></div>
+        <span id="plan-progress-label">0 / 0 sessions done</span>
+      </div>
+      <div id="plan-days" class="plan-days"></div>
+    </section>
+
+    <!-- NUTRITION -->
+    <section class="view" id="view-nutrition">
+      <div class="panel">
+        <h2>Your daily targets</h2>
+        <p class="muted">Calculated for a 77→71 kg cut while training 6×/week. Tuned to protect muscle.</p>
+        <div class="macro-grid">
+          <div class="macro cal"><span class="macro-val" id="n-cal">—</span><span class="macro-label">calories / day</span></div>
+          <div class="macro pro"><span class="macro-val" id="n-pro">—</span><span class="macro-label">g protein</span></div>
+          <div class="macro carb"><span class="macro-val" id="n-carb">—</span><span class="macro-label">g carbs</span></div>
+          <div class="macro fat"><span class="macro-val" id="n-fat">—</span><span class="macro-label">g fat</span></div>
+        </div>
+        <p class="hint" id="n-explain"></p>
+      </div>
+
+      <div class="panel">
+        <h2>Intermittent fasting window</h2>
+        <ul class="checklist-static">
+          <li><b>16:8 protocol.</b> Eat between 12:00–20:00, fast 20:00–12:00.</li>
+          <li><b>Break the fast with protein</b> (eggs, Greek yogurt, whey) to blunt hunger and protect muscle.</li>
+          <li><b>Train fasted or feed first?</b> Lift fed (carbs before weights). Easy runs are fine fasted; hard intervals & Hyrox feed first.</li>
+          <li><b>Black coffee, tea, water, electrolytes</b> are free during the fast.</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h2>The cheat day & drinking — read this</h2>
+        <p>This is the single biggest lever on whether you hit 71 kg. One unmanaged cheat day can erase a week's deficit.</p>
+        <ul class="checklist-static warn">
+          <li><b>Cap it at one meal, not a whole day.</b> "Cheat meal" beats "cheat day" 10:1.</li>
+          <li><b>Drinking twice a week is the main risk.</b> Alcohol halts fat-burning while it's metabolised and crushes next-day training. Aim for <b>one</b> drinking occasion/week during these 6 weeks.</li>
+          <li><b>Smart drinks:</b> spirits + soda/zero mixer, dry wine. Avoid beer & cocktails (liquid calories).</li>
+          <li><b>Protect the session before & after.</b> Eat protein, hydrate, no fried late-night food.</li>
+          <li><b>Put cheat meal on a training day</b> — extra carbs get used, not stored.</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h2>Daily food checklist</h2>
+        <div id="n-checklist"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Built with Claude Code · data stays in your browser</span>
+    <button class="btn tiny ghost" id="reset-btn">Reset all data</button>
+  </footer>
+
+  <script>
+/* ============================================================
+   PEAK — 6-week transformation tracker
+   Profile: 5'11" (180cm), 77kg → 71kg goal, ~10% body fat.
+   Pure vanilla JS. All data persisted to localStorage.
+   ============================================================ */
+
+const PROFILE = {
+  heightCm: 180,
+  startKg: 77,
+  goalKg: 71,
+  // 6-week plan starting "today" by default; user can re-weigh anytime.
+  weeks: 6,
+  ageDefault: 40, // used for BMR estimate; adjust in code if known
+};
+
+const STORE_KEY = 'peak.v1';
+
+/* ---------- State ---------- */
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* ignore */ }
+  return null;
+}
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+let state = loadState() || {
+  startDate: todayISO(),
+  weighins: [],            // { date: 'YYYY-MM-DD', kg: 77.0 }
+  doneSessions: {},        // { 'w1-d0': true, ... }
+  foodChecks: {},          // { 'YYYY-MM-DD': { 0:true, ... } }
+  viewWeek: 1,
+};
+// migrate any missing keys
+state.doneSessions = state.doneSessions || {};
+state.foodChecks = state.foodChecks || {};
+state.viewWeek = state.viewWeek || 1;
+
+/* ---------- Helpers ---------- */
+function todayISO() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+function parseISO(s) { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
+function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+function fmt(n, dp = 1) { return Number(n).toFixed(dp); }
+
+function latestWeight() {
+  if (!state.weighins.length) return PROFILE.startKg;
+  const sorted = [...state.weighins].sort((a,b) => a.date.localeCompare(b.date));
+  return sorted[sorted.length - 1].kg;
+}
+function totalDays() { return PROFILE.weeks * 7; }
+function endDate() {
+  const d = parseISO(state.startDate);
+  d.setDate(d.getDate() + totalDays());
+  return d;
+}
+function daysLeft() {
+  const left = daysBetween(new Date(new Date().toDateString()), endDate());
+  return Math.max(0, left);
+}
+// ideal weight on a given day index (linear 77 -> 71 over 42 days)
+function idealKgAt(dayIndex) {
+  const t = Math.min(1, Math.max(0, dayIndex / totalDays()));
+  return PROFILE.startKg - (PROFILE.startKg - PROFILE.goalKg) * t;
+}
+
+/* ---------- Nutrition math ---------- */
+function nutrition() {
+  const w = latestWeight();
+  const age = PROFILE.ageDefault;
+  // Mifflin-St Jeor (male)
+  const bmr = 10 * w + 6.25 * PROFILE.heightCm - 5 * age + 5;
+  // Active: 6 sessions/week -> ~1.55 multiplier
+  const tdee = bmr * 1.55;
+  // Target ~0.85 kg/week loss is the sustainable side of a 1kg goal.
+  // Use ~20% deficit but floor protein high to protect muscle.
+  let cal = Math.round((tdee * 0.78) / 10) * 10;
+  // protein 2.0 g/kg (muscle protection in a cut)
+  const protein = Math.round(w * 2.0);
+  // fat ~0.8 g/kg
+  const fat = Math.round(w * 0.8);
+  const calFromPF = protein * 4 + fat * 9;
+  const carbs = Math.max(60, Math.round((cal - calFromPF) / 4));
+  return { tdee: Math.round(tdee), cal, protein, carbs, fat, deficit: Math.round(tdee - cal) };
+}
+
+/* ============================================================
+   6-WEEK TRAINING PLAN
+   Mix: 2x Hyrox HIIT, 2x weights (extra LEG focus), 2-3x runs, IF.
+   Progressive overload week to week. Legs prioritised (the goal).
+   ============================================================ */
+const RUN_PROG = ['5 km easy','6 km steady','6 km tempo','7 km steady','8 km tempo','5 km hard'];
+const INTERVALS = [
+  '4×400 m @ hard, 90s jog',
+  '5×400 m @ hard, 90s jog',
+  '6×400 m @ hard, 75s jog',
+  '5×600 m @ hard, 90s jog',
+  '6×600 m @ hard, 75s jog',
+  '8×200 m flat-out, full recover',
+];
+
+function weekPlan(week) {
+  const i = week - 1;
+  const focus = [
+    'Foundation — groove the movements, build the habit.',
+    'Build — add load on legs, extend the runs.',
+    'Push — intensity climbs, dial in nutrition.',
+    'Peak volume — biggest week, lean hard on legs.',
+    'Sharpen — intensity up, volume holds.',
+    'Finish & reveal — push, then taper into the photo.',
+  ][i];
+
+  // Leg-day progressive overload cues
+  const legCue = [
+    '3×8 each: back squat, Bulgarian split squat, RDL, walking lunge, calf raise. Leave 2 reps in tank.',
+    '4×8: back squat, Bulgarian split squat, RDL, walking lunge, calf raise. +2.5–5kg vs wk1.',
+    '4×6–8 heavier: squat, RDL, split squat; finish 3×12 leg extension + calf.',
+    '5×5 squat (heavy) + 4×8 RDL, hip thrust, split squat. Biggest leg day.',
+    '4×6 squat + 4×8 RDL + 3×15 walking lunge burnout. Quality reps.',
+    '3×5 squat (moderate) + pump work. Keep legs full, not trashed.',
+  ][i];
+
+  const upperCue = [
+    '3×8: bench/push-up, row, overhead press, pull-up/lat pulldown, curls.',
+    '4×8: bench, row, OHP, pull-up, face pull + curls. +load vs wk1.',
+    '4×6–8 heavier press & row; 3×12 lateral raise + arms finisher.',
+    '5×5 bench + weighted pull-ups + OHP. Push the load.',
+    '4×6 press/pull + delt & arm pump for the taper look.',
+    '3×8 full-body pump — shoulders, back, arms for the photo.',
+  ][i];
+
+  const hyroxCue = [
+    '35 min: 4 rounds — 500m row, 20 wall balls, 15 burpees, 200m run. Steady.',
+    '40 min: 4 rounds — 600m ski/row, 20 wall balls, 20 lunges, 250m run.',
+    '40 min: 5 rounds — 500m row, 15 sandbag lunges, 15 burpee broad jumps, 200m run.',
+    '45 min: 5 rounds — sled push/pull, wall balls, farmers carry, 300m run. Hardest.',
+    '40 min: 5 fast rounds — row, burpees, lunges, run. Race pace.',
+    '30 min: 3 sharp rounds — keep it crisp, no junk fatigue.',
+  ][i];
+
+  const sat = [
+    { type:'hyrox', title:'Hyrox HIIT #2', detail: hyroxCue },
+    { type:'hyrox', title:'Hyrox HIIT #2', detail: hyroxCue },
+    { type:'hyrox', title:'Hyrox HIIT #2 + 3 km easy jog', detail: hyroxCue + ' Then 3 km flush jog.' },
+    { type:'hyrox', title:'Hyrox HIIT #2 (peak)', detail: hyroxCue },
+    { type:'hyrox', title:'Hyrox HIIT #2', detail: hyroxCue },
+    { type:'hyrox', title:'Hyrox HIIT #2 (sharp)', detail: hyroxCue },
+  ][i];
+
+  return {
+    week, focus,
+    days: [
+      { dow:'Mon', type:'legs',     title:'LOWER strength (leg priority)', detail: legCue },
+      { dow:'Tue', type:'run',      title:`Run — ${RUN_PROG[i]}`, detail:'Zone 2, nose-breathing pace. Easy means easy.' },
+      { dow:'Wed', type:'hyrox',    title:'Hyrox HIIT #1', detail: hyroxCue },
+      { dow:'Thu', type:'upper',    title:'UPPER strength', detail: upperCue },
+      { dow:'Fri', type:'run',      title:`Run intervals — ${INTERVALS[i]}`, detail:'Warm up 10 min. Feed carbs beforehand.' },
+      { dow:'Sat', type: sat.type,  title: sat.title, detail: sat.detail },
+      { dow:'Sun', type:'rest',     title:'Rest / mobility + cheat meal', detail:'Walk, stretch, foam roll. Put your one cheat meal here or on Sat.' },
+    ],
+  };
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render() {
+  renderDashboard();
+  renderWeight();
+  renderPlan();
+  renderNutrition();
+  saveState();
+}
+
+function renderDashboard() {
+  const cur = latestWeight();
+  const lost = PROFILE.startKg - cur;
+  const remaining = cur - PROFILE.goalKg;
+  const totalToLose = PROFILE.startKg - PROFILE.goalKg;
+  const pct = Math.min(100, Math.max(0, (lost / totalToLose) * 100));
+
+  $('#d-current').textContent = fmt(cur);
+  $('#d-goal').textContent = PROFILE.goalKg;
+  $('#d-lost').textContent = `${fmt(Math.max(0,lost))} kg lost`;
+  $('#d-remaining').textContent = `${fmt(Math.max(0,remaining))} kg to go`;
+  $('#d-progress').style.width = pct + '%';
+  $('#d-days').textContent = daysLeft();
+
+  // current week target (ideal weight at end of current week)
+  const dayIdx = daysBetween(parseISO(state.startDate), new Date(new Date().toDateString()));
+  const weekNo = Math.min(PROFILE.weeks, Math.max(1, Math.ceil((dayIdx + 1) / 7)));
+  const weekTarget = idealKgAt(weekNo * 7);
+  $('#d-weektarget').innerHTML = `${fmt(weekTarget)}<small>kg</small>`;
+
+  // pace
+  const idealNow = idealKgAt(Math.max(0, dayIdx));
+  let status, pace;
+  if (cur <= idealNow + 0.05) { status = 'On track ✅'; pace = 'On / ahead'; }
+  else if (cur <= idealNow + 0.6) { status = 'Close — tighten up'; pace = 'Slightly behind'; }
+  else { status = 'Behind — refocus'; pace = 'Behind'; }
+  if (state.weighins.length === 0) { status = "Let's go 💪"; pace = '—'; }
+  $('#d-status').textContent = status;
+  $('#d-pace').textContent = pace;
+
+  // today's workout
+  $('#d-today-date').textContent = new Date().toLocaleDateString(undefined, { weekday:'long', month:'long', day:'numeric' });
+  const dow = new Date().getDay(); // 0 Sun..6 Sat
+  const planIdx = (dow + 6) % 7;   // Mon=0
+  const plan = weekPlan(weekNo);
+  const day = plan.days[planIdx];
+  $('#d-today-workout').innerHTML = `
+    <div class="today-item">
+      <span class="pill ${day.type}">${day.type.toUpperCase()}</span>
+      <div><b>${day.title}</b><br><span class="muted" style="margin:0">${day.detail}</span></div>
+    </div>`;
+
+  // coach note
+  $('#d-coach').textContent = coachNote(cur, idealNow, remaining);
+}
+
+function coachNote(cur, idealNow, remaining) {
+  if (state.weighins.length === 0)
+    return "Log your first weigh-in to start tracking. Remember: the scale dips fast in week 1 (water + glycogen), then settles to real fat loss. Hit your protein, protect your legs in the gym, and keep drinking to one occasion this week.";
+  if (remaining <= 0)
+    return "🎯 You hit 71 kg. Now it's about the look — keep protein high, keep the leg work, and consider easing the deficit so you hold muscle. Time for the photo.";
+  if (cur > idealNow + 0.6)
+    return "You're a touch behind the ideal line. Most likely culprit: the cheat day or a drinking night. Tighten the deficit this week, move your cheat to a single meal on a training day, and add one extra Zone-2 run.";
+  return "Right on pace — nice work. Keep the lifts heavy on legs to fill them out while the fat comes off. Sleep 7–8h; recovery is where the look is built.";
+}
+
+/* ---------- Weight view ---------- */
+function renderWeight() {
+  if (!$('#w-date').value) $('#w-date').value = todayISO();
+  const tbody = $('#weight-table tbody');
+  const sorted = [...state.weighins].sort((a,b) => b.date.localeCompare(a.date));
+  tbody.innerHTML = '';
+  $('#weight-empty').style.display = sorted.length ? 'none' : 'block';
+  $('#weight-table').style.display = sorted.length ? 'table' : 'none';
+
+  sorted.forEach((w, i) => {
+    const prev = sorted[i + 1];
+    let delta = '';
+    if (prev) {
+      const d = w.kg - prev.kg;
+      const cls = d < 0 ? 'delta-down' : d > 0 ? 'delta-up' : '';
+      delta = `<span class="${cls}">${d > 0 ? '+' : ''}${fmt(d)}</span>`;
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${new Date(w.date).toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td>
+      <td><b>${fmt(w.kg)}</b> kg</td>
+      <td>${delta}</td>
+      <td style="text-align:right"><button class="del-btn" data-date="${w.date}">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll('.del-btn').forEach(b =>
+    b.addEventListener('click', () => {
+      state.weighins = state.weighins.filter(x => x.date !== b.dataset.date);
+      render();
+    }));
+
+  drawChart();
+}
+
+/* ---------- Canvas chart ---------- */
+function drawChart() {
+  const cv = $('#chart');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const padL = 46, padR = 16, padT = 16, padB = 28;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+
+  const yMax = PROFILE.startKg + 1.5;
+  const yMin = PROFILE.goalKg - 1.5;
+  const x = i => padL + (plotW * i) / totalDays();
+  const y = kg => padT + plotH * (1 - (kg - yMin) / (yMax - yMin));
+
+  // grid + y labels
+  ctx.strokeStyle = '#243150'; ctx.fillStyle = '#8a96b2';
+  ctx.font = '12px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for (let kg = Math.ceil(yMin); kg <= Math.floor(yMax); kg++) {
+    const yy = y(kg);
+    ctx.globalAlpha = 0.35; ctx.beginPath(); ctx.moveTo(padL, yy); ctx.lineTo(W - padR, yy); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.fillText(kg + '', padL - 8, yy);
+  }
+
+  // x labels (weeks)
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (let wk = 0; wk <= PROFILE.weeks; wk++) {
+    const xx = x(wk * 7);
+    ctx.fillText('W' + wk, xx, H - padB + 6);
+  }
+
+  // ideal line 77 -> 71
+  ctx.strokeStyle = '#5b8cff'; ctx.lineWidth = 2; ctx.setLineDash([6, 5]);
+  ctx.beginPath(); ctx.moveTo(x(0), y(PROFILE.startKg)); ctx.lineTo(x(totalDays()), y(PROFILE.goalKg)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // goal line
+  ctx.strokeStyle = '#38e0a6'; ctx.globalAlpha = 0.4; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, y(PROFILE.goalKg)); ctx.lineTo(W - padR, y(PROFILE.goalKg)); ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // actual data
+  const sorted = [...state.weighins].sort((a,b) => a.date.localeCompare(b.date));
+  if (sorted.length) {
+    ctx.strokeStyle = '#38e0a6'; ctx.lineWidth = 3; ctx.beginPath();
+    sorted.forEach((w, i) => {
+      const di = Math.max(0, Math.min(totalDays(), daysBetween(parseISO(state.startDate), parseISO(w.date))));
+      const px = x(di), py = y(w.kg);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+    // points
+    ctx.fillStyle = '#38e0a6';
+    sorted.forEach(w => {
+      const di = Math.max(0, Math.min(totalDays(), daysBetween(parseISO(state.startDate), parseISO(w.date))));
+      ctx.beginPath(); ctx.arc(x(di), y(w.kg), 4, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+}
+
+/* ---------- Plan view ---------- */
+function renderPlan() {
+  const week = state.viewWeek;
+  const plan = weekPlan(week);
+  $('#plan-week-title').textContent = `Week ${week}`;
+  $('#plan-week-focus').textContent = plan.focus;
+
+  const container = $('#plan-days');
+  container.innerHTML = '';
+  let done = 0, trainable = 0;
+  plan.days.forEach((day, idx) => {
+    const key = `w${week}-d${idx}`;
+    const isDone = !!state.doneSessions[key];
+    if (day.type !== 'rest') { trainable++; if (isDone) done++; }
+    const el = document.createElement('div');
+    el.className = 'day-card' + (isDone ? ' done' : '');
+    el.innerHTML = `
+      <div class="day-head">
+        <span class="pill ${day.type}">${day.type.toUpperCase()}</span>
+        <span class="dow">${day.dow}</span>
+        <button class="check" data-key="${key}">✓</button>
+      </div>
+      <p class="day-title"><b>${day.title}</b></p>
+      <p class="day-detail">${day.detail}</p>`;
+    container.appendChild(el);
+  });
+  container.querySelectorAll('.check').forEach(b =>
+    b.addEventListener('click', () => {
+      const k = b.dataset.key;
+      state.doneSessions[k] = !state.doneSessions[k];
+      render();
+    }));
+
+  const pct = trainable ? (done / trainable) * 100 : 0;
+  $('#plan-progress').style.width = pct + '%';
+  $('#plan-progress-label').textContent = `${done} / ${trainable} sessions done`;
+}
+
+/* ---------- Nutrition view ---------- */
+function renderNutrition() {
+  const n = nutrition();
+  $('#n-cal').textContent = n.cal;
+  $('#n-pro').textContent = n.protein;
+  $('#n-carb').textContent = n.carbs;
+  $('#n-fat').textContent = n.fat;
+  $('#n-explain').innerHTML =
+    `Your estimated maintenance is ~<b>${n.tdee} kcal</b> with your training load. ` +
+    `We're eating <b>${n.cal} kcal</b> — a ~${n.deficit} kcal/day deficit, which targets roughly 0.7–0.9 kg/week of mostly fat loss. ` +
+    `Protein is set high (<b>${n.protein}g</b>) so the weight you lose is fat, not the leg muscle you're trying to build. Recalculates as your weight drops.`;
+
+  // daily food checklist (resets per day)
+  const today = todayISO();
+  const checks = state.foodChecks[today] || {};
+  const items = [
+    'Hit protein target (aim 30–40g per meal)',
+    'First meal within your eating window (12:00)',
+    'Last bite before 20:00 (close the window)',
+    '2–3 L water + electrolytes',
+    'Veg / fibre with 2 meals',
+    'No alcohol today (or it\'s your one planned occasion)',
+    '7–8 hours sleep last night',
+  ];
+  const wrap = $('#n-checklist');
+  wrap.innerHTML = '';
+  items.forEach((label, i) => {
+    const on = !!checks[i];
+    const el = document.createElement('div');
+    el.className = 'today-item' + (on ? ' checked' : '');
+    el.innerHTML = `<span class="cbox">✓</span><span>${label}</span>`;
+    el.addEventListener('click', () => {
+      state.foodChecks[today] = state.foodChecks[today] || {};
+      state.foodChecks[today][i] = !state.foodChecks[today][i];
+      render();
+    });
+    wrap.appendChild(el);
+  });
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+function $(sel) { return document.querySelector(sel); }
+function $all(sel) { return document.querySelectorAll(sel); }
+
+$('#tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab');
+  if (!btn) return;
+  $all('.tab').forEach(t => t.classList.remove('active'));
+  $all('.view').forEach(v => v.classList.remove('active'));
+  btn.classList.add('active');
+  $('#view-' + btn.dataset.tab).classList.add('active');
+  if (btn.dataset.tab === 'weight') drawChart();
+});
+
+$('#weight-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const date = $('#w-date').value;
+  const kg = parseFloat($('#w-kg').value);
+  if (!date || isNaN(kg)) return;
+  // replace if same date already logged
+  state.weighins = state.weighins.filter(w => w.date !== date);
+  state.weighins.push({ date, kg });
+  $('#w-kg').value = '';
+  render();
+});
+
+$('#week-prev').addEventListener('click', () => {
+  state.viewWeek = Math.max(1, state.viewWeek - 1); render();
+});
+$('#week-next').addEventListener('click', () => {
+  state.viewWeek = Math.min(PROFILE.weeks, state.viewWeek + 1); render();
+});
+
+$('#reset-btn').addEventListener('click', () => {
+  if (confirm('Reset all weigh-ins, checkmarks and progress? This cannot be undone.')) {
+    localStorage.removeItem(STORE_KEY);
+    location.reload();
+  }
+});
+
+render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Peak — 6-Week Transformation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">▲</span>
+      <div>
+        <h1>PEAK</h1>
+        <p class="tagline">6-week shred · 77 → 71 kg</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="dashboard">Dashboard</button>
+      <button class="tab" data-tab="weight">Weight</button>
+      <button class="tab" data-tab="plan">Training Plan</button>
+      <button class="tab" data-tab="nutrition">Nutrition</button>
+    </nav>
+  </header>
+
+  <main id="app">
+    <!-- DASHBOARD -->
+    <section class="view active" id="view-dashboard">
+      <div class="hero">
+        <div class="hero-stat">
+          <span class="label">Current</span>
+          <span class="big"><span id="d-current">—</span><small>kg</small></span>
+        </div>
+        <div class="hero-arrow">→</div>
+        <div class="hero-stat">
+          <span class="label">Goal</span>
+          <span class="big goal"><span id="d-goal">71</span><small>kg</small></span>
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-head">
+          <span id="d-lost">0.0 kg lost</span>
+          <span id="d-remaining">6.0 kg to go</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="d-progress"></div></div>
+      </div>
+
+      <div class="cards">
+        <div class="card">
+          <span class="card-label">Days left</span>
+          <span class="card-value" id="d-days">42</span>
+        </div>
+        <div class="card">
+          <span class="card-label">On-track pace</span>
+          <span class="card-value" id="d-pace">—</span>
+        </div>
+        <div class="card">
+          <span class="card-label">This week's target</span>
+          <span class="card-value" id="d-weektarget">—<small>kg</small></span>
+        </div>
+        <div class="card">
+          <span class="card-label">Status</span>
+          <span class="card-value status" id="d-status">Let's go</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Today</h2>
+        <p class="muted" id="d-today-date"></p>
+        <div class="today-grid" id="d-today-workout"></div>
+      </div>
+
+      <div class="panel coach">
+        <h2>Coach's note</h2>
+        <p id="d-coach"></p>
+      </div>
+    </section>
+
+    <!-- WEIGHT -->
+    <section class="view" id="view-weight">
+      <div class="panel">
+        <h2>Log a weigh-in</h2>
+        <form id="weight-form" class="inline-form">
+          <input type="date" id="w-date" required />
+          <input type="number" id="w-kg" step="0.1" min="40" max="200" placeholder="kg" required />
+          <button type="submit" class="btn">Add</button>
+        </form>
+        <p class="hint">Weigh in first thing, after the bathroom, before eating — same conditions daily.</p>
+      </div>
+
+      <div class="panel">
+        <h2>Trajectory</h2>
+        <div class="chart-legend">
+          <span><i class="dot ideal"></i> Ideal line</span>
+          <span><i class="dot actual"></i> Your weight</span>
+        </div>
+        <div class="chart-box"><canvas id="chart" width="900" height="380"></canvas></div>
+      </div>
+
+      <div class="panel">
+        <h2>History</h2>
+        <table class="data-table" id="weight-table">
+          <thead><tr><th>Date</th><th>Weight</th><th>Δ</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="empty" id="weight-empty">No weigh-ins yet — log your first one above.</p>
+      </div>
+    </section>
+
+    <!-- PLAN -->
+    <section class="view" id="view-plan">
+      <div class="week-switch">
+        <button class="btn ghost" id="week-prev">‹</button>
+        <div class="week-title">
+          <h2 id="plan-week-title">Week 1</h2>
+          <p class="muted" id="plan-week-focus"></p>
+        </div>
+        <button class="btn ghost" id="week-next">›</button>
+      </div>
+      <div class="week-progress">
+        <div class="progress-bar slim"><div class="progress-fill" id="plan-progress"></div></div>
+        <span id="plan-progress-label">0 / 0 sessions done</span>
+      </div>
+      <div id="plan-days" class="plan-days"></div>
+    </section>
+
+    <!-- NUTRITION -->
+    <section class="view" id="view-nutrition">
+      <div class="panel">
+        <h2>Your daily targets</h2>
+        <p class="muted">Calculated for a 77→71 kg cut while training 6×/week. Tuned to protect muscle.</p>
+        <div class="macro-grid">
+          <div class="macro cal"><span class="macro-val" id="n-cal">—</span><span class="macro-label">calories / day</span></div>
+          <div class="macro pro"><span class="macro-val" id="n-pro">—</span><span class="macro-label">g protein</span></div>
+          <div class="macro carb"><span class="macro-val" id="n-carb">—</span><span class="macro-label">g carbs</span></div>
+          <div class="macro fat"><span class="macro-val" id="n-fat">—</span><span class="macro-label">g fat</span></div>
+        </div>
+        <p class="hint" id="n-explain"></p>
+      </div>
+
+      <div class="panel">
+        <h2>Intermittent fasting window</h2>
+        <ul class="checklist-static">
+          <li><b>16:8 protocol.</b> Eat between 12:00–20:00, fast 20:00–12:00.</li>
+          <li><b>Break the fast with protein</b> (eggs, Greek yogurt, whey) to blunt hunger and protect muscle.</li>
+          <li><b>Train fasted or feed first?</b> Lift fed (carbs before weights). Easy runs are fine fasted; hard intervals & Hyrox feed first.</li>
+          <li><b>Black coffee, tea, water, electrolytes</b> are free during the fast.</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h2>The cheat day & drinking — read this</h2>
+        <p>This is the single biggest lever on whether you hit 71 kg. One unmanaged cheat day can erase a week's deficit.</p>
+        <ul class="checklist-static warn">
+          <li><b>Cap it at one meal, not a whole day.</b> "Cheat meal" beats "cheat day" 10:1.</li>
+          <li><b>Drinking twice a week is the main risk.</b> Alcohol halts fat-burning while it's metabolised and crushes next-day training. Aim for <b>one</b> drinking occasion/week during these 6 weeks.</li>
+          <li><b>Smart drinks:</b> spirits + soda/zero mixer, dry wine. Avoid beer & cocktails (liquid calories).</li>
+          <li><b>Protect the session before & after.</b> Eat protein, hydrate, no fried late-night food.</li>
+          <li><b>Put cheat meal on a training day</b> — extra carbs get used, not stored.</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h2>Daily food checklist</h2>
+        <div id="n-checklist"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>Built with Claude Code · data stays in your browser</span>
+    <button class="btn tiny ghost" id="reset-btn">Reset all data</button>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
